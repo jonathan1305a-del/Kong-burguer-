@@ -1,0 +1,426 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kong Burguer | Delivery</title>
+  <meta name="description" content="Monte seu pedido da Kong Burguer e envie no WhatsApp." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f0f10; --card:#17181b; --ink:#f5f7fb; --muted:#b9bfcc; --brand:#ff6a00; --brand2:#ff9f1a; --ok:#2ecc71;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto; background:var(--bg); color:var(--ink);} 
+    a{color:var(--brand)}
+    .wrap{max-width:1100px; margin:0 auto; padding:16px}
+    header{display:flex; align-items:center; gap:16px; padding:12px 0 8px}
+    header img{width:70px; height:70px; border-radius:16px; object-fit:cover; background:#fff}
+    .title{line-height:1}
+    .title h1{margin:0; font-size:28px}
+    .title p{margin:2px 0 0; color:var(--muted)}.grid{display:grid; grid-template-columns:1fr; gap:14px}
+@media (min-width:880px){ .grid{grid-template-columns:2fr 1fr} }
+
+.card{background:var(--card); border:1px solid #25262a; border-radius:18px; box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.card h2{margin:0; padding:14px 16px; border-bottom:1px solid #26272b; font-size:18px}
+.section{padding:12px 14px}
+
+.menu{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px}
+.item{background:#1d1f24; border:1px solid #2a2c31; border-radius:16px; padding:10px; display:flex; flex-direction:column; gap:8px}
+.item h3{margin:0; font-size:16px}
+.muted{color:var(--muted); font-size:12px}
+.price{font-weight:700}
+.row{display:flex; align-items:center; justify-content:space-between; gap:8px}
+.qty{display:flex; align-items:center; gap:6px}
+button, .chip{cursor:pointer}
+.btn{background:linear-gradient(135deg,var(--brand),var(--brand2)); color:#111; border:0; padding:10px 14px; border-radius:12px; font-weight:800}
+.btn:disabled{opacity:.5; cursor:not-allowed}
+.ghost{background:transparent; border:1px solid #32343a; color:var(--ink); padding:8px 10px; border-radius:12px}
+.circle{width:30px; height:30px; border-radius:9px; background:#23252b; border:1px solid #2e3138}
+
+.extras{display:none; background:#17181b; border-top:1px dashed #2b2d34; padding-top:8px; margin-top:4px}
+.extras label{display:flex; justify-content:space-between; gap:8px; padding:6px 0; font-size:13px}
+.extras .muted{font-size:11px}
+
+.basket{display:flex; flex-direction:column; gap:8px}
+.bline{display:flex; justify-content:space-between; gap:8px; padding:8px; border:1px solid #2a2c31; border-radius:12px}
+.bname{font-weight:600}
+.bsmall{color:var(--muted); font-size:12px}
+
+.totals{margin-top:8px; border-top:1px dashed #30323a; padding-top:8px}
+.totals div{display:flex; justify-content:space-between; margin:4px 0}
+.big{font-size:20px; font-weight:800}
+
+.fields{display:grid; gap:8px}
+.fields label{font-size:12px; color:var(--muted)}
+input, select, textarea{background:#1b1d22; color:var(--ink); border:1px solid #2b2d34; border-radius:12px; padding:10px; width:100%}
+textarea{min-height:70px}
+
+.footer{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:10px 14px}
+.pill{background:#1c1e23; border:1px solid #30323a; padding:8px 12px; border-radius:999px}
+
+.menu-img{width:100%; border-radius:14px; border:1px solid #2a2c31}
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <!-- Salve as imagens na mesma pasta do arquivo como 'logo.jpg' e 'menu.jpg'  -->
+      <img src="logo.jpg" alt="Logo Kong Burguer" />
+      <div class="title">
+        <h1>Kong Burguer • Delivery</h1>
+        <p>📍 Parnamirim/RN — Peça pelo WhatsApp: <a href="https://wa.me/5584991684526" target="_blank">(84) 99168-4526</a> • Instagram: <a href="https://instagram.com/kongburgueroficial" target="_blank">@kongburgueroficial</a></p>
+      </div>
+    </header><div class="grid">
+  <!-- COLUNA MENU -->
+  <div class="card">
+    <h2>🍔 Cardápio — toque em “+” para adicionar</h2>
+    <div class="section">
+      <img class="menu-img" src="menu.jpg" alt="Menu impresso"/>
+    </div>
+    <div class="section">
+      <div class="menu" id="menu"></div>
+    </div>
+  </div>
+
+  <!-- COLUNA CARRINHO / ENTREGA -->
+  <div class="card">
+    <h2>🧺 Seu pedido</h2>
+    <div class="section basket" id="basket"></div>
+
+    <div class="section">
+      <div class="fields">
+        <div>
+          <label>Nome</label>
+          <input id="cliNome" placeholder="Seu nome"/>
+        </div>
+        <div>
+          <label>Telefone</label>
+          <input id="cliTel" placeholder="(84) 9...."/>
+        </div>
+        <div>
+          <label>Bairro para entrega (calcula taxa)</label>
+          <select id="bairro"></select>
+        </div>
+        <div>
+          <label>Endereço completo</label>
+          <input id="endereco" placeholder="Rua, número, complemento"/>
+        </div>
+        <div>
+          <label>Ponto de referência</label>
+          <input id="referencia" placeholder="Ex.: Próx. à praça"/>
+        </div>
+        <div>
+          <label>Forma de pagamento</label>
+          <select id="pagamento">
+            <option value="PIX">PIX</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Crédito">Cartão de Crédito</option>
+            <option value="Débito">Cartão de Débito</option>
+            <option value="VR">Vale Refeição</option>
+          </select>
+        </div>
+        <div id="trocoBox" style="display:none">
+          <label>Troco para quanto?</label>
+          <input id="troco" placeholder="Ex.: 50,00"/>
+        </div>
+        <div>
+          <label>Observações gerais</label>
+          <textarea id="obs" placeholder="Ex.: retirar cebola do X-Tudo"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section totals" id="totals"></div>
+    <div class="footer">
+      <span class="pill">⏱️ Tempo médio: 30–60 min</span>
+      <div style="display:flex; gap:8px">
+        <button class="ghost" id="clearBtn">Limpar</button>
+        <button class="btn" id="zapBtn">Enviar no WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="muted" style="margin-top:12px">Dica: salve este arquivo como <strong>index.html</strong> e abra no seu celular/PC. Hospede grátis no GitHub Pages, Netlify ou Vercel quando desejar.</p>
+
+  </div>  <script>
+    // ======= CONFIGURAÇÕES =======
+    const WHATSAPP = '5584991684526';
+
+    const bairros = {
+      'Selecione...': 0,
+      'Bela Parnamirim (Vista)': 3,
+      'Bela Vista': 3,
+      'Passagem de Areia': 4,
+      'Cajupiranga': 8,
+      'Cidade Campestre': 4,
+      'Bosque (Colinas, Brasil)': 8,
+      'Jardim Planalto': 8,
+      'Parque de Exposições': 6,
+      'Coopab': 10,
+      'Cohabinal': 6,
+      'Centro (Boa Esperança)': 6,
+      'Rosa dos Ventos': 4,
+      'Santos Reis': 4,
+      'Santa Teresa': 4,
+      'Vale do Sol': 6,
+      'Monte Castelo': 4,
+      'Nova Esperança': 6,
+      'Liberdade': 8,
+      'Parque Industrial': 8,
+      'Emaús': 10,
+      'Nova Parnamirim': 15,
+      'Pitimbu': 15,
+      'Planalto': 15,
+      'Natal': 25
+    };
+
+    const extrasCatalog = [
+      {id:'hamburguer', nome:'Hambúrguer extra', preco:2},
+      {id:'ovo', nome:'Ovo', preco:2},
+      {id:'cheddar', nome:'Cheddar', preco:2},
+      {id:'coalho', nome:'Queijo coalho', preco:2},
+      {id:'mussarela', nome:'Mussarela', preco:2},
+      {id:'bacon', nome:'Bacon', preco:2},
+      {id:'calabresa', nome:'Calabresa', preco:2},
+      {id:'frango', nome:'Frango', preco:2},
+      {id:'carne', nome:'Carne', preco:2}
+    ];
+
+    // Itens do cardápio (do seu menu)
+    const produtos = [
+      // Hamburguer padrão
+      {id:'kong-simples', nome:'Kong-Simples', preco:9.80, grupo:'Hambúrguer Padrão'},
+      {id:'kong-frango', nome:'Kong-Frango', preco:10.00, grupo:'Hambúrguer Padrão'},
+      {id:'kong-serta', nome:'Kong-Sertanejo', preco:11.70, grupo:'Hambúrguer Padrão'},
+      {id:'rugido', nome:'Rugido-Duplo', preco:14.00, grupo:'Hambúrguer Padrão'},
+      {id:'kong-nord', nome:'Kong-Nordestino', preco:14.40, grupo:'Hambúrguer Padrão'},
+      {id:'sup-x', nome:'Supremo X-Tudo', preco:14.90, grupo:'Hambúrguer Padrão'},
+      {id:'kong-doidao', nome:'Kong Doidão', preco:15.40, grupo:'Hambúrguer Padrão'},
+      // Especiais
+      {id:'domador', nome:'Domador Americano', preco:11.10, grupo:'Hambúrguer Especial'},
+      {id:'furia', nome:'Fúria da Selva', preco:12.40, grupo:'Hambúrguer Especial', banana:true},
+      // Pesticos
+      {id:'batata-m', nome:'Batata Frita M', preco:9.30, grupo:'Pesticos'},
+      {id:'batata-g', nome:'Batata Frita G', preco:15.40, grupo:'Pesticos'},
+      {id:'batata-bacon-m', nome:'Batata Frita com Bacon M', preco:18.00, grupo:'Pesticos'},
+      {id:'batata-bacon-g', nome:'Batata Frita com Bacon G', preco:30.00, grupo:'Pesticos'},
+      {id:'batata-calab-m', nome:'Batata Frita com Calabresa M', preco:16.70, grupo:'Pesticos'},
+      {id:'batata-calab-g', nome:'Batata Frita com Calabresa G', preco:30.00, grupo:'Pesticos'},
+      // Bebidas
+      {id:'coca', nome:'Coca-Cola Lata', preco:6.50, grupo:'Bebidas'},
+      {id:'guarana', nome:'Guaraná Antarctica Lata', preco:5.20, grupo:'Bebidas'},
+      // Combos
+      {id:'combo-doidao', nome:'Combo Kong Doidão', preco:21.90, grupo:'Combos'},
+      {id:'combo-rugido', nome:'Combo Rugido Duplo', preco:20.50, grupo:'Combos'},
+      {id:'combo-serta', nome:'Combo Kong Sertanejo', preco:18.00, grupo:'Combos'},
+      {id:'combo-nord', nome:'Combo Kong Nordestino', preco:20.90, grupo:'Combos'},
+    ];
+
+    // ======= ESTADO DO CARRINHO =======
+    const cart = new Map(); // id -> {q, extras:{id:qtd}, semBanana:boolean}
+
+    function moeda(v){
+      return v.toLocaleString('pt-BR',{style:'currency', currency:'BRL'});
+    }
+
+    function renderMenu(){
+      const byGroup = {};
+      produtos.forEach(p=>{byGroup[p.grupo] ||= []; byGroup[p.grupo].push(p)});
+      const el = document.getElementById('menu');
+      el.innerHTML = '';
+      Object.keys(byGroup).forEach(gr=>{
+        const head = document.createElement('div');
+        head.className='item';
+        head.innerHTML = `<h3>${gr}</h3><div class="muted">Selecione seus itens abaixo</div>`;
+        el.appendChild(head);
+        byGroup[gr].forEach(p=> el.appendChild(itemCard(p)) );
+      });
+    }
+
+    function itemCard(p){
+      const div = document.createElement('div');
+      div.className='item';
+      div.id = `item-${p.id}`;
+      const bananaLine = p.banana ? '<div class="muted">Contém banana frita</div>' : '';
+      div.innerHTML = `
+        <div class="row">
+          <div>
+            <h3>${p.nome}</h3>
+            ${bananaLine}
+            <div class="muted">Preço unitário</div>
+          </div>
+          <div class="price">${moeda(p.preco)}</div>
+        </div>
+        <div class="row">
+          <div class="qty">
+            <button class="circle" aria-label="menos" onclick="add('${p.id}',-1)">−</button>
+            <span id="q-${p.id}">0</span>
+            <button class="circle" aria-label="mais" onclick="add('${p.id}',1)">+</button>
+          </div>
+          <button class="ghost" onclick="toggleExtras('${p.id}')">Personalizar</button>
+        </div>
+        <div class="extras" id="ex-${p.id}">
+          ${p.banana ? `<label><span>Retirar banana frita</span><input type="checkbox" onchange="setSemBanana('${p.id}', this.checked)"></label>`:''}
+          <div class="muted">Adicionais (+R$ 2,00 cada)</div>
+          ${extrasCatalog.map(e=>`<label><span>${e.nome}</span>
+            <div style='display:flex;gap:6px;align-items:center'>
+              <button class='circle' onclick="addExtra('${p.id}','${e.id}',-1)">−</button>
+              <span id="exq-${p.id}-${e.id}">0</span>
+              <button class='circle' onclick="addExtra('${p.id}','${e.id}',1)">+</button>
+            </div></label>`).join('')}
+        </div>
+      `;
+      return div;
+    }
+
+    function toggleExtras(pid){
+      const box = document.getElementById('ex-'+pid);
+      box.style.display = box.style.display==='block' ? 'none' : 'block';
+    }
+
+    function ensure(pid){
+      if(!cart.has(pid)) cart.set(pid,{q:0, extras:{}, semBanana:false});
+      return cart.get(pid);
+    }
+
+    function add(pid,delta){
+      const it = ensure(pid);
+      it.q = Math.max(0, it.q + delta);
+      document.getElementById('q-'+pid).textContent = it.q;
+      if(it.q===0){ it.extras={}; it.semBanana=false; document.getElementById('ex-'+pid).style.display='none'; }
+      renderBasket();
+    }
+
+    function addExtra(pid, eid, delta){
+      const it = ensure(pid); if(it.q===0){ add(pid,1); }
+      it.extras[eid] = Math.max(0, (it.extras[eid]||0) + delta);
+      document.getElementById(`exq-${pid}-${eid}`).textContent = it.extras[eid];
+      renderBasket();
+    }
+
+    function setSemBanana(pid, checked){
+      const it = ensure(pid); it.semBanana = checked; renderBasket();
+    }
+
+    function renderBasket(){
+      const b = document.getElementById('basket');
+      b.innerHTML='';
+      let subtotal = 0;
+      cart.forEach((it,pid)=>{
+        if(it.q<=0) return;
+        const p = produtos.find(x=>x.id===pid);
+        let extrasTotal = 0;
+        let extrasTxt = [];
+        Object.entries(it.extras).forEach(([eid,q])=>{
+          if(q>0){ extrasTotal += q*2; const name = extrasCatalog.find(e=>e.id===eid).nome; extrasTxt.push(`${name} x${q}`); }
+        });
+        const line = document.createElement('div');
+        line.className='bline';
+        const itemTotal = p.preco*it.q + extrasTotal; // extras aplicados à linha inteira
+        subtotal += itemTotal;
+        const details = [];
+        if(p.banana && it.semBanana) details.push('sem banana frita');
+        if(extrasTxt.length) details.push('extras: '+extrasTxt.join(', '));
+        line.innerHTML = `
+          <div>
+            <div class='bname'>${it.q}× ${p.nome}</div>
+            <div class='bsmall'>${details.join(' • ')}</div>
+          </div>
+          <div class='bname'>${moeda(itemTotal)}</div>
+        `;
+        b.appendChild(line);
+      });
+
+      const taxa = Number(document.getElementById('bairro').selectedOptions[0]?.dataset.valor||0);
+      const total = subtotal + taxa;
+
+      const totals = document.getElementById('totals');
+      totals.innerHTML = `
+        <div><span>Subtotal</span><strong>${moeda(subtotal)}</strong></div>
+        <div><span>Taxa de entrega</span><strong>${moeda(taxa)}</strong></div>
+        <div class='big'><span>Total</span><span>${moeda(total)}</span></div>
+      `;
+    }
+
+    function fillBairros(){
+      const sel = document.getElementById('bairro');
+      Object.entries(bairros).forEach(([nome,valor],idx)=>{
+        const op = document.createElement('option');
+        op.value = nome; op.textContent = idx===0? 'Selecione seu bairro': `${nome} — ${moeda(valor)}`; op.dataset.valor = valor;
+        sel.appendChild(op);
+      });
+      sel.addEventListener('change', renderBasket);
+    }
+
+    function encode(s){ return encodeURIComponent(s).replace(/%20/g,'+'); }
+
+    function montarMensagem(){
+      let linhas = [];
+      linhas.push('*🦍 KONG BURGUER — NOVO PEDIDO*');
+      cart.forEach((it,pid)=>{
+        if(it.q<=0) return; const p = produtos.find(x=>x.id===pid);
+        let extrasTxt = [];
+        Object.entries(it.extras).forEach(([eid,q])=>{ if(q>0){ extrasTxt.push(`${extrasCatalog.find(e=>e.id===eid).nome} x${q}`) } });
+        const dets = [];
+        if(p.banana && it.semBanana) dets.push('sem banana frita');
+        if(extrasTxt.length) dets.push('extras: '+extrasTxt.join(', '));
+        linhas.push(`• ${it.q}× ${p.nome}${dets.length?` (${dets.join(' • ')})`:''}`);
+      });
+
+      const bairroSel = document.getElementById('bairro');
+      const bairro = bairroSel.value; const taxa = Number(bairroSel.selectedOptions[0]?.dataset.valor||0);
+      const nome = document.getElementById('cliNome').value || '-';
+      const tel = document.getElementById('cliTel').value || '-';
+      const end = document.getElementById('endereco').value || '-';
+      const ref = document.getElementById('referencia').value || '-';
+      const pag = document.getElementById('pagamento').value;
+      const troco = document.getElementById('troco').value || '';
+      const obs = document.getElementById('obs').value || '';
+
+      linhas.push('');
+      linhas.push(`Bairro: ${bairro} (taxa ${moeda(taxa)})`);
+      linhas.push(`Endereço: ${end}`);
+      linhas.push(`Referência: ${ref}`);
+      linhas.push(`Cliente: ${nome} | Tel: ${tel}`);
+      linhas.push(`Pagamento: ${pag}${pag==='Dinheiro' && troco? ` (troco para ${troco})`:''}`);
+      if(obs) linhas.push(`Obs.: ${obs}`);
+
+      // Resumo de valores
+      const subtotal = [...cart.entries()].reduce((acc,[pid,it])=>{
+        if(it.q<=0) return acc; const p = produtos.find(x=>x.id===pid);
+        const ext = Object.values(it.extras).reduce((s,q)=>s+q*2,0);
+        return acc + p.preco*it.q + ext;
+      },0);
+      const total = subtotal + taxa;
+      linhas.push('');
+      linhas.push(`Subtotal: ${moeda(subtotal)}`);
+      linhas.push(`Taxa: ${moeda(taxa)}`);
+      linhas.push(`TOTAL: *${moeda(total)}*`);
+
+      return linhas.join('%0A');
+    }
+
+    function enviarWhatsApp(){
+      const temItens = [...cart.values()].some(it=>it.q>0);
+      if(!temItens){ alert('Adicione ao menos 1 item ao pedido.'); return; }
+      const url = `https://wa.me/${WHATSAPP}?text=${montarMensagem()}`;
+      window.open(url, '_blank');
+    }
+
+    // Eventos
+    document.getElementById('clearBtn').addEventListener('click',()=>{ cart.clear(); renderMenu(); renderBasket(); });
+    document.getElementById('zapBtn').addEventListener('click', enviarWhatsApp);
+    document.getElementById('pagamento').addEventListener('change', (e)=>{
+      document.getElementById('trocoBox').style.display = e.target.value==='Dinheiro' ? 'block' : 'none';
+    });
+
+    // Init
+    renderMenu();
+    fillBairros();
+    renderBasket();
+  </script></body>
+</html>
